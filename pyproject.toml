@@ -1,6 +1,6 @@
 [project]
 name = "sphinx-needs-datatables-config"
-version = "0.1.0"
+version = "0.2.0"
 description = "Configurable DataTables initialization for Sphinx-Needs tables"
 readme = "README.md"
 requires-python = ">=3.11"
