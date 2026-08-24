@@ -15,9 +15,7 @@ class _TableClassParser(HTMLParser):
         super().__init__()
         self.tables: list[set[str]] = []
 
-    def handle_starttag(
-        self, tag: str, attrs: list[tuple[str, str | None]]
-    ) -> None:
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag != "table":
             return
 
@@ -72,8 +70,7 @@ def test_prepare_needtable_options() -> None:
 
     assert options["style"] == "datatables"
     assert options["class"] == (
-        "custom-table;sphinx-needs-datatables-config;"
-        "sphinx-needs-datatables-config--wide"
+        "custom-table;sphinx-needs-datatables-config;sphinx-needs-datatables-config--wide"
     )
 
 
