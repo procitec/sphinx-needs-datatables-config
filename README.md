@@ -13,12 +13,6 @@ equivalent functionality is available directly in Sphinx-Needs.
 uv add sphinx-needs-datatables-config
 ```
 
-During local development:
-
-```bash
-uv sync --dev
-```
-
 ## Activate the extension
 
 ```python
@@ -125,60 +119,7 @@ used directly:
      - open
 ```
 
-## Integration into req_tools
-
-Keep the existing `:style: datatables` behavior and add a `:config:` option to
-the custom report directives.
-
-For example:
-
-```rst
-.. acc_requirement_report::
-   :style: datatables
-   :config: requirements
-```
-
-When creating the table node, call the helper:
-
-```python
-from sphinx_needs_datatables_config import mark_datatable
-
-mark_datatable(table_node, self.options.get("config"))
-```
-
-`mark_datatable()` adds the configuration classes. It deliberately leaves an
-existing `NEEDS_DATATABLES` class untouched.
-
-This means Sphinx-Needs may initialize the table first. The extension detects
-that state, destroys that DataTable instance and initializes it again with the
-selected named configuration. Tables without a config marker are not touched.
-
-If you later prefer to avoid this short-lived double initialization, req_tools
-can omit `NEEDS_DATATABLES` for configured tables. The extension supports both
-variants.
-
-A minimal directive option looks like:
-
-```python
-from docutils.parsers.rst import directives
-
-option_spec = {
-    # ...
-    "style": directives.unchanged,
-    "config": directives.unchanged_required,
-}
-```
-
 ## Commands
-
-```bash
-just test
-just lint
-just build
-just demo
-```
-
-Without `just`:
 
 ```bash
 uv run pytest
@@ -200,4 +141,3 @@ Once Sphinx-Needs implements issue #408, the intended migration is:
 1. remove `sphinx_needs_datatables_config` from `extensions`;
 2. remove this package dependency;
 3. keep `needs_datatable_config` and the RST `:config:` names where compatible;
-4. adapt only the small req_tools table-marking integration if required.
