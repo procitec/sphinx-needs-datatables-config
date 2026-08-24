@@ -7,6 +7,7 @@ from typing import Any
 from sphinx.application import Sphinx
 
 from .config import serialize_configs
+from .needtable import ConfigurableNeedtableDirective
 
 
 def _install_javascript(app: Sphinx) -> None:
@@ -32,6 +33,8 @@ def setup(app: Sphinx) -> dict[str, Any]:
     # The extension intentionally relies on the DataTables bundle delivered by
     # Sphinx-Needs instead of shipping a second copy.
     app.setup_extension("sphinx_needs")
+
+    app.add_directive("needtable", ConfigurableNeedtableDirective, override=True)
 
     app.add_config_value(
         "needs_datatable_config",

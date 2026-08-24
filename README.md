@@ -81,14 +81,38 @@ normal DataTables configuration objects, but not JavaScript callback functions.
 
 ## Select a configuration
 
-A table opts in using two CSS classes:
+For a Sphinx-Needs ``needtable``, select a named configuration directly with
+``:config:``:
 
-```text
-sphinx-needs-datatables-config
-sphinx-needs-datatables-config--<config-name>
+```rst
+.. needtable::
+   :config: requirements
 ```
 
-Example with a normal Sphinx `list-table`:
+``:config:`` implicitly selects the Sphinx-Needs ``datatables`` style, so
+``:style: datatables`` is not required. If another style is explicitly selected,
+the build fails. Unknown configuration names are also reported during the Sphinx
+build.
+
+Existing classes are preserved:
+
+```rst
+.. needtable::
+   :config: requirements
+   :class: my-project-table
+```
+
+The generated table contains the Sphinx-Needs class plus the extension marker
+classes:
+
+```text
+NEEDS_DATATABLES
+sphinx-needs-datatables-config
+sphinx-needs-datatables-config--requirements
+```
+
+For arbitrary Docutils/Sphinx table nodes, the same marker classes can still be
+used directly:
 
 ```rst
 .. list-table:: Example
@@ -100,15 +124,6 @@ Example with a normal Sphinx `list-table`:
    * - REQ_001
      - open
 ```
-
-The extension also understands the optional HTML attribute:
-
-```html
-data-needs-datatable-config="requirements"
-```
-
-The class-based variant is useful because Docutils/Sphinx table nodes already
-support CSS classes without requiring a custom HTML translator.
 
 ## Integration into req_tools
 
