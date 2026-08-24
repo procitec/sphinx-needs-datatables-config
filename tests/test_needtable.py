@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from html.parser import HTMLParser
 from io import StringIO
 from pathlib import Path
 
@@ -7,6 +8,27 @@ import pytest
 from sphinx.application import Sphinx
 
 from sphinx_needs_datatables_config.needtable import prepare_needtable_options
+
+
+class _TableClassParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.tables: list[set[str]] = []
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        if tag != "table":
+            return
+
+        attributes = dict(attrs)
+        self.tables.append(set((attributes.get("class") or "").split()))
+
+
+def _table_classes(html: str) -> list[set[str]]:
+    parser = _TableClassParser()
+    parser.feed(html)
+    return parser.tables
 
 
 def _build_html(tmp_path: Path, index: str, config: str) -> str:
@@ -50,7 +72,8 @@ def test_prepare_needtable_options() -> None:
 
     assert options["style"] == "datatables"
     assert options["class"] == (
-        "custom-table;sphinx-needs-datatables-config;sphinx-needs-datatables-config--wide"
+        "custom-table;sphinx-needs-datatables-config;"
+        "sphinx-needs-datatables-config--wide"
     )
 
 
@@ -84,10 +107,16 @@ Demo
         'needs_datatable_config = {"wide": {"pageLength": 25}}',
     )
 
-    assert "NEEDS_DATATABLES" in html
-    assert "custom-table" in html
-    assert "sphinx-needs-datatables-config" in html
-    assert "sphinx-needs-datatables-config--wide" in html
+    tables = _table_classes(html)
+    assert any(
+        {
+            "NEEDS_DATATABLES",
+            "custom-table",
+            "sphinx-needs-datatables-config",
+            "sphinx-needs-datatables-config--wide",
+        }.issubset(classes)
+        for classes in tables
+    )
 
 
 def test_needtable_without_config_remains_unmarked(tmp_path: Path) -> None:
@@ -105,4 +134,6 @@ Demo
         'needs_datatable_config = {"wide": {"pageLength": 25}}',
     )
 
-    assert "sphinx-needs-datatables-config" not in html
+    tables = _table_classes(html)
+    assert tables
+    assert all("sphinx-needs-datatables-config" not in classes for classes in tables)

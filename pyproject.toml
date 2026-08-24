@@ -21,6 +21,11 @@ build-backend = "uv_build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore:.*BuildEnvironment\\.app.*:sphinx.deprecation.RemovedInSphinx11Warning:sphinx_needs\\..*",
+    "ignore:The frontend\\.OptionParser class will be replaced.*:DeprecationWarning:sphinx_needs\\.layout",
+    "ignore:The frontend\\.Option class will be removed.*:DeprecationWarning:optparse",
+]
 
 [tool.ruff]
 target-version = "py311"

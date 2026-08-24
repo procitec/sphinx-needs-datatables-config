@@ -10,7 +10,9 @@ from sphinx_needs.directives.needtable import NeedtableDirective
 from .table import CONFIG_CLASS, CONFIG_CLASS_PREFIX, validate_config_name
 
 
-def prepare_needtable_options(options: dict[str, Any], configs: Mapping[str, object]) -> None:
+def prepare_needtable_options(
+    options: dict[str, Any], configs: Mapping[str, object]
+) -> None:
     """Apply ``:config:`` semantics to Sphinx-Needs needtable options."""
     config_name = options.get("config")
     if not config_name:
@@ -41,7 +43,9 @@ def prepare_needtable_options(options: dict[str, Any], configs: Mapping[str, obj
         f"{CONFIG_CLASS_PREFIX}{config_name}",
     ]
     existing_classes = str(options.get("class", "")).strip()
-    options["class"] = ";".join(value for value in [existing_classes, *config_classes] if value)
+    options["class"] = ";".join(
+        value for value in [existing_classes, *config_classes] if value
+    )
 
 
 class ConfigurableNeedtableDirective(NeedtableDirective):
@@ -56,7 +60,7 @@ class ConfigurableNeedtableDirective(NeedtableDirective):
         try:
             prepare_needtable_options(
                 self.options,
-                self.env.app.config.needs_datatable_config,
+                self.env.config.needs_datatable_config,
             )
         except ValueError as exc:
             raise self.error(str(exc)) from exc
