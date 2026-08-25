@@ -121,7 +121,6 @@ The generated table contains the Sphinx-Needs class plus the extension marker
 classes:
 
 ```text
-NEEDS_DATATABLES
 sphinx-needs-datatables-config
 sphinx-needs-datatables-config--requirements
 ```
@@ -138,15 +137,6 @@ used directly:
      - Status
    * - REQ_001
      - open
-```
-
-## Commands
-
-```bash
-uv run pytest
-uv run ruff check .
-uv build
-uv run sphinx-build -W -b html docs docs/_build/html
 ```
 
 ## Design boundaries
