@@ -106,9 +106,7 @@ Demo
 
     tables = _table_classes(html)
     configured_tables = [
-        classes
-        for classes in tables
-        if "sphinx-needs-datatables-config" in classes
+        classes for classes in tables if "sphinx-needs-datatables-config" in classes
     ]
     assert configured_tables
     assert any(
