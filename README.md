@@ -73,6 +73,27 @@ needs_datatable_config = {
 Configuration values must currently be JSON-serializable. That covers the
 normal DataTables configuration objects, but not JavaScript callback functions.
 
+### PDF column widths
+
+For `pdf` and `pdfHtml5` buttons, the extension adds the declarative
+`columnWidths` option. It is converted in the browser to the pdfmake
+`customize` callback required by DataTables:
+
+```python
+{
+    "extend": "pdfHtml5",
+    "orientation": "landscape",
+    "pageSize": "A4",
+    "columnWidths": ["12%", "25%", "10%", "*", "15%"],
+}
+```
+
+Supported values are the normal pdfmake width values, for example percentages,
+`"*"`, `"auto"`, or fixed numeric widths. The number of entries must match the
+number of columns exported to the PDF. For percentage-only layouts, keep the
+total at about 100%. `columnWidths` is an extension-specific option and is
+removed before the remaining configuration is passed to DataTables.
+
 ## Select a configuration
 
 For a Sphinx-Needs ``needtable``, select a named configuration directly with
