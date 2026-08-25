@@ -23,9 +23,9 @@ def validate_config_name(config_name: str) -> str:
 def mark_datatable(table_node: nodes.Element, config_name: str | None) -> None:
     """Mark a Docutils table node for initialization by this extension.
 
-    Existing ``NEEDS_DATATABLES`` is intentionally kept. If Sphinx-Needs has
-    already initialized the table, the browser-side extension destroys that
-    instance before applying the selected configuration.
+    Existing ``NEEDS_DATATABLES`` may be present while the doctree is built.
+    During ``doctree-resolved`` the extension removes that Sphinx-Needs loader
+    marker from configured tables before HTML is written.
     """
     if not config_name:
         return

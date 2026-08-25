@@ -105,15 +105,21 @@ Demo
     )
 
     tables = _table_classes(html)
+    configured_tables = [
+        classes
+        for classes in tables
+        if "sphinx-needs-datatables-config" in classes
+    ]
+    assert configured_tables
     assert any(
         {
-            "NEEDS_DATATABLES",
             "custom-table",
             "sphinx-needs-datatables-config",
             "sphinx-needs-datatables-config--wide",
         }.issubset(classes)
-        for classes in tables
+        for classes in configured_tables
     )
+    assert all("NEEDS_DATATABLES" not in classes for classes in configured_tables)
 
 
 def test_needtable_without_config_remains_unmarked(tmp_path: Path) -> None:

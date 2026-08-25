@@ -4,10 +4,12 @@ from importlib.metadata import version
 from importlib.resources import files
 from typing import Any
 
+from docutils import nodes
 from sphinx.application import Sphinx
 
 from .config import serialize_configs
 from .needtable import ConfigurableNeedtableDirective
+from .table import CONFIG_CLASS
 
 
 def _install_javascript(app: Sphinx) -> None:
@@ -23,10 +25,26 @@ def _install_javascript(app: Sphinx) -> None:
         .read_text(encoding="utf-8")
     )
 
-    # Sphinx-Needs installs its DataTables assets with the normal extension
-    # priority. We deliberately run afterwards.
+    # Sphinx-Needs provides DataTables and its default loader. Our JavaScript
+    # runs afterwards, but configured tables are removed from the default
+    # Sphinx-Needs selector during ``doctree-resolved`` below.
     app.add_js_file(None, priority=890, body=config_script)
     app.add_js_file(None, priority=900, body=javascript)
+
+
+def _prepare_configured_tables(
+    app: Sphinx,
+    doctree: nodes.document,
+    docname: str,
+) -> None:
+    """Keep configured tables out of the Sphinx-Needs default DataTables loader."""
+    if app.builder.format != "html":
+        return
+
+    for table in doctree.findall(nodes.table):
+        classes = table.get("classes", [])
+        if CONFIG_CLASS in classes and "NEEDS_DATATABLES" in classes:
+            classes.remove("NEEDS_DATATABLES")
 
 
 def setup(app: Sphinx) -> dict[str, Any]:
@@ -44,6 +62,10 @@ def setup(app: Sphinx) -> dict[str, Any]:
         description="Named DataTables configuration objects.",
     )
     app.connect("builder-inited", _install_javascript)
+    # Sphinx-Needs turns Needtable nodes into normal table nodes during
+    # ``doctree-resolved``. Run afterwards and remove its loader marker only
+    # from tables that are explicitly managed by this extension.
+    app.connect("doctree-resolved", _prepare_configured_tables, priority=900)
 
     return {
         "version": version("sphinx-needs-datatables-config"),

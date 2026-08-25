@@ -50,17 +50,16 @@
             return;
         }
 
-        const $table = window.jQuery(table);
-
-        // Configured tables may still carry NEEDS_DATATABLES for compatibility
-        // with existing req_tools output. Sphinx-Needs initializes those first.
-        // Destroy that instance before applying the selected full configuration.
         if (window.jQuery.fn.dataTable.isDataTable(table)) {
-            $table.DataTable().destroy();
+            console.warn(
+                "sphinx-needs-datatables-config: table was already initialized",
+                table
+            );
+            return;
         }
 
         const tableConfig = window.jQuery.extend(true, {}, config);
-        $table.DataTable(tableConfig);
+        window.jQuery(table).DataTable(tableConfig);
     }
 
     window.jQuery(document).ready(function () {
