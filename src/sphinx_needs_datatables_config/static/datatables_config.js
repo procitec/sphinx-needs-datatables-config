@@ -18,6 +18,71 @@
         return null;
     }
 
+    function findPdfTable(doc) {
+        if (!doc || !Array.isArray(doc.content)) {
+            return null;
+        }
+
+        for (const item of doc.content) {
+            if (item && item.table && Array.isArray(item.table.body)) {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
+    function prepareButton(button) {
+        if (!button || typeof button !== "object" || Array.isArray(button)) {
+            return;
+        }
+
+        if (Object.prototype.hasOwnProperty.call(button, "columnWidths")) {
+            const columnWidths = button.columnWidths;
+            delete button.columnWidths;
+
+            if (!Array.isArray(columnWidths)) {
+                console.warn(
+                    "sphinx-needs-datatables-config: columnWidths must be an array",
+                    button
+                );
+            } else if (button.extend !== "pdf" && button.extend !== "pdfHtml5") {
+                console.warn(
+                    "sphinx-needs-datatables-config: columnWidths is only supported " +
+                        "for pdf/pdfHtml5 buttons",
+                    button
+                );
+            } else {
+                button.customize = function (doc) {
+                    const pdfTable = findPdfTable(doc);
+
+                    if (!pdfTable) {
+                        console.warn(
+                            "sphinx-needs-datatables-config: no table found in PDF document"
+                        );
+                        return;
+                    }
+
+                    pdfTable.table.widths = columnWidths;
+                };
+            }
+        }
+
+        if (Array.isArray(button.buttons)) {
+            button.buttons.forEach(prepareButton);
+        }
+    }
+
+    function prepareTableConfig(config) {
+        const tableConfig = window.jQuery.extend(true, {}, config);
+
+        if (Array.isArray(tableConfig.buttons)) {
+            tableConfig.buttons.forEach(prepareButton);
+        }
+
+        return tableConfig;
+    }
+
     function initializeTable(table, configs) {
         const configName = getConfigName(table);
 
@@ -58,7 +123,7 @@
             return;
         }
 
-        const tableConfig = window.jQuery.extend(true, {}, config);
+        const tableConfig = prepareTableConfig(config);
         window.jQuery(table).DataTable(tableConfig);
     }
 
